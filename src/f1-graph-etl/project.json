@@ -1,13 +1,13 @@
 {
     "version": "1.0.0",
     "dependencies": {
-        "Microsoft.Framework.Runtime.Abstractions": "1.0.0-beta5",
+        "Microsoft.Framework.Runtime.Abstractions": "1.0.0-beta6",
         "Microsoft.AspNet.WebApi.Client": "5.2.3"
     },
     "frameworks": {
-        "dnx451": { 
+        "dnx451": {
             "frameworkAssemblies": {
-                
+
             }
         }
     }
