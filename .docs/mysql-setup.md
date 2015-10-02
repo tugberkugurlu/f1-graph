@@ -64,3 +64,19 @@ mysql> SELECT COUNT(*) FROM lapTimes;
 +----------+
 1 row in set (0.00 sec)
 ```
+
+## Connecting to MySQL instance from your application
+
+First, grab the IP Address of your MySQL container instance.
+
+> docker inspect f1mysql | grep IPAddress
+
+Once you have the IP address, you can use the below connection string for that:
+
+```
+Data Source=172.17.0.12;port=3306;Initial Catalog=f1;User Id=root;password=1234567890
+```
+
+## Connecting to MySQL Server from your application inside another container
+
+> TODO: write this up...

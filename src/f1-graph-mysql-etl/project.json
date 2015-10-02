@@ -2,11 +2,12 @@
     "version": "1.0.0",
     "dependencies": {
         "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-beta7",
-        "Microsoft.AspNet.WebApi.Client": "5.2.3"
+        "MySql.Data": "6.9.7"
     },
     "frameworks": {
         "dnx451": {
             "frameworkAssemblies": {
+              "System.Data": "4.0.0.0"
             }
         }
     }
