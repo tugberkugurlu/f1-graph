@@ -7,22 +7,34 @@ using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using F1.Domain;
+using MongoDB.Driver;
+using Nte.Identity.Domain;
+using F1.Domain.Entities;
 
-namespace F1Graph.Etl
+namespace F1Graph.MySql.Etl
 {
     public class Program
     {
         private readonly string _mySqlConnectionString = "Data Source=172.17.0.12;port=3306;Initial Catalog=f1;User Id=root;password=1234567890";
         private readonly string _mongoDbConnectionStr = "mongodb://172.17.0.16:27017";
 
-        public void Main(string[] args)
+        public async Task Main(string[] args)
         {
-            var drivers = GetDrivers().Select(driver => driver.ToEntity());
+            var mongoDatabase = ConfigureAndGetMongoDatabase();
+            var driversCollection = mongoDatabase.GetCollection<DriverEntity>("drivers");
 
-            foreach (var driver in drivers)
-            {
-                Console.WriteLine(driver.Firstname + " " + driver.Lastname);
-            }
+            var drivers = GetDrivers().Select(driver => driver.ToEntity());
+            await driversCollection.InsertManyAsync(drivers);
+        }
+
+        private IMongoDatabase ConfigureAndGetMongoDatabase()
+        {
+            var client = new MongoClient(_mongoDbConnectionStr);
+            var database = client.GetDatabase("f1");
+
+            MongoConfig.Configure(MongoConvetionsConfig.RegisterGlobalConventions);
+
+            return database;
         }
 
         private IEnumerable<Driver> GetDrivers()

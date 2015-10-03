@@ -2,9 +2,9 @@ using System;
 using F1.Domain.ValueObjects;
 using MongoDB.Bson;
 
-namespace F1.Domain
+namespace F1.Domain.Entities
 {
-    public class DriverEntity
+    public class DriverEntity : BaseEntity
     {
         public DriverEntity(string firstName, string lastName, string nationality, string url)
             : this(firstName, lastName, nationality, url, null)
@@ -27,7 +27,6 @@ namespace F1.Domain
             if (url == null)
                 throw new ArgumentNullException("url");
 
-            Id = ObjectId.GenerateNewId().ToString();
             Firstname = firstName;
             Lastname = lastName;
             Nationality = nationality;
@@ -35,7 +34,6 @@ namespace F1.Domain
             DateOfBirth = dateOfBirth;
         }
 
-        public string Id { get; private set; }
         public string Firstname { get; private set; }
         public string Lastname { get; private set; }
         public string Nationality { get; private set; }
