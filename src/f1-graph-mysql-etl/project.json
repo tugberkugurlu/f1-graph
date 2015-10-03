@@ -3,7 +3,8 @@
     "dependencies": {
         "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-beta7",
         "MySql.Data": "6.9.7",
-        "MongoDB.Driver": "2.0.1"
+        "MongoDB.Driver": "2.0.1",
+        "f1-domain": ""
     },
     "frameworks": {
         "dnx451": {

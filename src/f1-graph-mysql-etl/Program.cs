@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
+using F1.Domain;
 
 namespace F1Graph.Etl
 {
@@ -16,12 +17,11 @@ namespace F1Graph.Etl
 
         public void Main(string[] args)
         {
-            var drivers = GetDrivers();
-            var seasons = GetSeasons();
+            var drivers = GetDrivers().Select(driver => driver.ToEntity());
 
             foreach (var driver in drivers)
             {
-                Console.WriteLine(driver.Firstname + " " + driver.Surname);
+                Console.WriteLine(driver.Firstname + " " + driver.Lastname);
             }
         }
 
@@ -106,6 +106,13 @@ namespace F1Graph.Etl
             {
                 yield return projection(reader);
             }
+        }
+
+        public static DriverEntity ToEntity(this Driver driver)
+        {
+            return driver.DateOfBirth != null
+                ? new DriverEntity(driver.Firstname, driver.Surname, driver.Nationality, driver.Url, driver.DateOfBirth.Value)
+                : new DriverEntity(driver.Firstname, driver.Surname, driver.Nationality, driver.Url);
         }
     }
 }
