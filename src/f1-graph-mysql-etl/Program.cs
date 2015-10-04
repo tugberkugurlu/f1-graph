@@ -26,9 +26,11 @@ namespace F1Graph.MySql.Etl
         {
             var mongoDatabase = ConfigureAndGetMongoDatabase();
             var driversCollection = mongoDatabase.GetCollection<DriverEntity>("drivers");
+            var constructorsCollection = mongoDatabase.GetCollection<ConstructorEntity>("constructors");
             var circuitsCollection = mongoDatabase.GetCollection<CircuitEntity>("circuits");
             var seasonsCollection = mongoDatabase.GetCollection<SeasonEntity>("seasons");
             driversCollection.Drop();
+            constructorsCollection.Drop();
             circuitsCollection.Drop();
             seasonsCollection.Drop();
 
@@ -37,6 +39,18 @@ namespace F1Graph.MySql.Etl
             {
                 var drivers = GetDrivers().Select(driver => driver.ToEntity());
                 await driversCollection.InsertManyAsync(drivers);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
+
+            Console.WriteLine("trying to get the constructors now...");
+            try
+            {
+                var constructors = GetConstructors().Select(ctor => ctor.ToEntity());
+                await constructorsCollection.InsertManyAsync(constructors);
             }
             catch (Exception e)
             {
@@ -108,6 +122,18 @@ namespace F1Graph.MySql.Etl
             });
         }
 
+        private IEnumerable<Constructor> GetConstructors()
+        {
+            return Get("SELECT * FROM constructors", r => new Constructor
+            {
+                Id = int.Parse(r["constructorId"].ToString()),
+                ConstructorRef = r["constructorRef"].ToString(),
+                Name = r["name"].ToString(),
+                Nationality = r["nationality"].ToString(),
+                Url = r["url"].ToString()
+            });
+        }
+
         private IEnumerable<Circuit> GetCircuits()
         {
             return Get("SELECT * FROM circuits", r => new Circuit
@@ -158,6 +184,15 @@ namespace F1Graph.MySql.Etl
         public string Url { get; set; }
     }
 
+    public class Constructor
+    {
+        public int Id { get; set; }
+        public string ConstructorRef { get; set; }
+        public string Name { get; set; }
+        public string Nationality { get; set; }
+        public string Url { get; set; }
+    }
+
     public class Driver
     {
         public int Id { get; set; }
@@ -190,6 +225,15 @@ namespace F1Graph.MySql.Etl
             return driver.DateOfBirth != null
                 ? new DriverEntity(driver.Id.ToString(CultureInfo.InvariantCulture), driver.Firstname, driver.Surname, driver.Nationality, driver.Url, driver.DateOfBirth.Value)
                 : new DriverEntity(driver.Id.ToString(CultureInfo.InvariantCulture), driver.Firstname, driver.Surname, driver.Nationality, driver.Url);
+        }
+
+        public static ConstructorEntity ToEntity(this Constructor constructor)
+        {
+            return new ConstructorEntity(
+                constructor.Id.ToString(CultureInfo.InvariantCulture),
+                constructor.Name,
+                constructor.Nationality,
+                constructor.Url);
         }
 
         public static CircuitEntity ToEntity(this Circuit circuit)
