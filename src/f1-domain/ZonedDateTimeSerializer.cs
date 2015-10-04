@@ -15,7 +15,7 @@ namespace F1.Domain
     {
         private static class Flags
         {
-            public const long UnixEpoch = 1;
+            public const long MillisecondsSinceEpoch = 1;
             public const long TimeZoneId = 2;
         }
 
@@ -27,7 +27,7 @@ namespace F1.Domain
         {
             _helper = new SerializerHelper
             (
-                new SerializerHelper.Member("msSinceEpoch", Flags.UnixEpoch),
+                new SerializerHelper.Member("msSinceEpoch", Flags.MillisecondsSinceEpoch),
                 new SerializerHelper.Member("timeZoneId", Flags.TimeZoneId)
             );
         }
@@ -35,9 +35,8 @@ namespace F1.Domain
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, ZonedDateTime value)
         {
             var bsonWriter = context.Writer;
-            var dateTimeOffset = value.ToDateTimeOffset();
             bsonWriter.WriteStartDocument();
-            bsonWriter.WriteInt64("msSinceEpoch", BsonUtils.ToMillisecondsSinceEpoch(dateTimeOffset.UtcDateTime));
+            bsonWriter.WriteInt64("msSinceEpoch", BsonUtils.ToMillisecondsSinceEpoch(value.ToDateTimeUtc()));
             bsonWriter.WriteString("timeZoneId", value.Zone.Id);
             bsonWriter.WriteEndDocument();
         }
@@ -58,7 +57,7 @@ namespace F1.Domain
                 {
                     switch (flag)
                     {
-                        case Flags.UnixEpoch: epoch = _int64Serializer.Deserialize(context); break;
+                        case Flags.MillisecondsSinceEpoch: epoch = _int64Serializer.Deserialize(context); break;
                         case Flags.TimeZoneId: timeZone = DateTimeZoneProviders.Tzdb[_stringSerializer.Deserialize(context)]; break;
                     }
                 });
