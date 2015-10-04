@@ -1,9 +1,22 @@
+using System;
 using NodaTime;
 
 namespace F1.Domain.Entities
 {
     public class RaceEntity : BaseEntity
     {
+        public RaceEntity(string name, ZonedDateTime raceDateTime, string url)
+        {
+            if (name == null)
+                throw new ArgumentNullException("name");
+            if (url == null)
+                throw new ArgumentNullException("url");
+
+            Name = name;
+            RaceDateTime = raceDateTime;
+            Url = url;
+        }
+
         public string Name { get; private set; }
 
         /// <summary>
@@ -12,7 +25,7 @@ namespace F1.Domain.Entities
         /// <remarks>
         /// UTC time is not stored as it's possible to get to that from this.
         /// </remarks>
-        public ZonedDateTime RaceDateAndTime { get; private set; }
+        public ZonedDateTime RaceDateTime { get; private set; }
 
         public string Url { get; private set; }
     }

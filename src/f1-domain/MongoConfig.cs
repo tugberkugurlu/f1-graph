@@ -5,7 +5,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Nte.Identity.Domain
+namespace F1.Domain
 {
     public static class MongoConfig
     {
@@ -40,6 +40,11 @@ namespace Nte.Identity.Domain
                cm.AutoMap();
                cm.MapMember(c => c.Id).SetSerializer(new StringSerializer(BsonType.ObjectId));
                cm.SetIdMember(cm.GetMemberMap(c => c.Id));
+            });
+
+            BsonClassMap.RegisterClassMap<RaceEntity>(cm =>
+            {
+                cm.MapMember(c => c.RaceDateTime).SetSerializer(new ZonedDateTimeSerializer());
             });
         }
 

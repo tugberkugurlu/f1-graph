@@ -41,7 +41,8 @@ namespace F1.Domain
         {
             var bsonWriter = context.Writer;
             var dateTimeOffset = value.ToDateTimeOffset();
-            bsonWriter.WriteDateTime("DateTime", BsonUtils.ToMillisecondsSinceEpoch(dateTimeOffset.UtcDateTime);
+            bsonWriter.WriteStartDocument();
+            bsonWriter.WriteDateTime("DateTime", BsonUtils.ToMillisecondsSinceEpoch(dateTimeOffset.UtcDateTime));
             bsonWriter.WriteInt64("Ticks", dateTimeOffset.Ticks);
             bsonWriter.WriteInt32("Offset", (int)dateTimeOffset.Offset.TotalMinutes);
             bsonWriter.WriteString("TimeZoneId", value.Zone.Id);
