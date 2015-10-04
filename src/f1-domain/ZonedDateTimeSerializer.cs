@@ -15,25 +15,20 @@ namespace F1.Domain
     {
         private static class Flags
         {
-            public const long DateTime = 1;
-            public const long Ticks = 2;
-            public const long Offset = 4;
-            public const long TimeZoneId = 8;
+            public const long UnixEpoch = 1;
+            public const long TimeZoneId = 2;
         }
 
         private readonly SerializerHelper _helper;
         private readonly Int64Serializer _int64Serializer = new Int64Serializer();
-        private readonly Int32Serializer _int32Serializer = new Int32Serializer();
         private readonly StringSerializer _stringSerializer = new StringSerializer();
 
         public ZonedDateTimeSerializer()
         {
             _helper = new SerializerHelper
             (
-                new SerializerHelper.Member("DateTime", Flags.DateTime),
-                new SerializerHelper.Member("Ticks", Flags.Ticks),
-                new SerializerHelper.Member("Offset", Flags.Offset),
-                new SerializerHelper.Member("TimeZoneId", Flags.TimeZoneId)
+                new SerializerHelper.Member("unixEpoch", Flags.UnixEpoch),
+                new SerializerHelper.Member("timeZoneId", Flags.TimeZoneId)
             );
         }
 
@@ -42,41 +37,33 @@ namespace F1.Domain
             var bsonWriter = context.Writer;
             var dateTimeOffset = value.ToDateTimeOffset();
             bsonWriter.WriteStartDocument();
-            bsonWriter.WriteDateTime("DateTime", BsonUtils.ToMillisecondsSinceEpoch(dateTimeOffset.UtcDateTime));
-            bsonWriter.WriteInt64("Ticks", dateTimeOffset.Ticks);
-            bsonWriter.WriteInt32("Offset", (int)dateTimeOffset.Offset.TotalMinutes);
-            bsonWriter.WriteString("TimeZoneId", value.Zone.Id);
+            bsonWriter.WriteInt64("unixEpoch", BsonUtils.ToMillisecondsSinceEpoch(dateTimeOffset.UtcDateTime));
+            bsonWriter.WriteString("timeZoneId", value.Zone.Id);
             bsonWriter.WriteEndDocument();
         }
 
         public override ZonedDateTime Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var bsonReader = context.Reader;
-            long ticks;
-            TimeSpan offset;
+            long epoch;
             DateTimeZone timeZone;
 
             BsonType bsonType = bsonReader.GetCurrentBsonType();
             if (bsonType == BsonType.Document)
             {
-                ticks = 0;
-                offset = TimeSpan.Zero;
+                epoch = 0;
                 timeZone = null;
 
                 _helper.DeserializeMembers(context, (elementName, flag) =>
                 {
                     switch (flag)
                     {
-                        case Flags.DateTime: bsonReader.SkipValue(); break; // ignore value
-                        case Flags.Ticks: ticks = _int64Serializer.Deserialize(context); break;
-                        case Flags.Offset: offset = TimeSpan.FromMinutes(_int32Serializer.Deserialize(context)); break;
+                        case Flags.UnixEpoch: epoch = _int64Serializer.Deserialize(context); break;
                         case Flags.TimeZoneId: timeZone = DateTimeZoneProviders.Tzdb[_stringSerializer.Deserialize(context)]; break;
                     }
                 });
 
-                var dateTimeOffset = new DateTimeOffset(ticks, offset);
-                var instant = Instant.FromDateTimeOffset(dateTimeOffset);
-
+                var instant = Instant.FromMillisecondsSinceUnixEpoch(epoch);
                 return new ZonedDateTime(instant, timeZone);
             }
             else
