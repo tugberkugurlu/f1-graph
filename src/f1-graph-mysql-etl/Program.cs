@@ -27,8 +27,10 @@ namespace F1Graph.MySql.Etl
             var mongoDatabase = ConfigureAndGetMongoDatabase();
             var driversCollection = mongoDatabase.GetCollection<DriverEntity>("drivers");
             var circuitsCollection = mongoDatabase.GetCollection<CircuitEntity>("circuits");
+            var seasonsCollection = mongoDatabase.GetCollection<SeasonEntity>("seasons");
             driversCollection.Drop();
             circuitsCollection.Drop();
+            seasonsCollection.Drop();
 
             Console.WriteLine("trying to get the drivers now...");
             try
@@ -47,6 +49,18 @@ namespace F1Graph.MySql.Etl
             {
                 var circuits = GetCircuits().Select(circuit => circuit.ToEntity());
                 await circuitsCollection.InsertManyAsync(circuits);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
+
+            Console.WriteLine("trying to get the seasons now...");
+            try
+            {
+                var seasons = GetSeasons().Select(season => season.ToEntity());
+                await seasonsCollection.InsertManyAsync(seasons);
             }
             catch (Exception e)
             {
@@ -111,7 +125,7 @@ namespace F1Graph.MySql.Etl
 
         private IEnumerable<Season> GetSeasons()
         {
-            return Get("SELECT * FROM seasons", r => new Season
+            return Get("select * from seasons order by year", r => new Season
             {
                 Year = int.Parse(r["year"].ToString()),
                 Url = r["url"].ToString()
@@ -189,6 +203,11 @@ namespace F1Graph.MySql.Etl
                 circuit.Country,
                 location,
                 circuit.Url);
+        }
+
+        public static SeasonEntity ToEntity(this Season season)
+        {
+            return new SeasonEntity(season.Year, season.Url);
         }
 
         public static void Drop<TEntity>(this IMongoCollection<TEntity> collection)
