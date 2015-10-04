@@ -10,9 +10,13 @@ using F1.Domain;
 using MongoDB.Driver;
 using Nte.Identity.Domain;
 using F1.Domain.Entities;
+using F1.Domain.ValueObjects;
 
 namespace F1Graph.MySql.Etl
 {
+    /// <remarks>
+    /// <para> - The race date inside the 'races' table in MySQL database is UTC time on the specified date.</para>
+    /// </remarks>
     public class Program
     {
         private readonly string _mySqlConnectionString = "Data Source=172.17.0.12;port=3306;Initial Catalog=f1;User Id=root;password=1234567890";
@@ -22,9 +26,33 @@ namespace F1Graph.MySql.Etl
         {
             var mongoDatabase = ConfigureAndGetMongoDatabase();
             var driversCollection = mongoDatabase.GetCollection<DriverEntity>("drivers");
+            var circuitsCollection = mongoDatabase.GetCollection<CircuitEntity>("circuits");
+            driversCollection.Drop();
+            circuitsCollection.Drop();
 
-            var drivers = GetDrivers().Select(driver => driver.ToEntity());
-            await driversCollection.InsertManyAsync(drivers);
+            Console.WriteLine("trying to get the drivers now...");
+            try
+            {
+                var drivers = GetDrivers().Select(driver => driver.ToEntity());
+                await driversCollection.InsertManyAsync(drivers);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
+
+            Console.WriteLine("trying to get the circuits now...");
+            try
+            {
+                var circuits = GetCircuits().Select(circuit => circuit.ToEntity());
+                await circuitsCollection.InsertManyAsync(circuits);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
         }
 
         private IMongoDatabase ConfigureAndGetMongoDatabase()
@@ -39,58 +67,81 @@ namespace F1Graph.MySql.Etl
 
         private IEnumerable<Driver> GetDrivers()
         {
-            using (DbConnection connection = new MySqlConnection(_mySqlConnectionString))
-            using (DbCommand cmd = new MySqlCommand("SELECT * FROM drivers"))
+            return Get("SELECT * FROM drivers", r =>
             {
-                connection.Open();
-                cmd.Connection = connection;
-                var reader = cmd.ExecuteReader();
-
-                return reader.Select(r =>
+                var driver = new Driver
                 {
-                    var driver = new Driver
-                    {
-                        Id = int.Parse(r["driverId"].ToString()),
-                        RefCode = r["driverRef"].ToString(),
-                        Firstname = r["forename"].ToString(),
-                        Surname = r["surname"].ToString(),
-                        Nationality = r["nationality"].ToString(),
-                        Url = r["url"].ToString()
-                    };
+                    Id = int.Parse(r["driverId"].ToString()),
+                    RefCode = r["driverRef"].ToString(),
+                    Firstname = r["forename"].ToString(),
+                    Surname = r["surname"].ToString(),
+                    Nationality = r["nationality"].ToString(),
+                    Url = r["url"].ToString()
+                };
 
-                    DateTime dob;
-                    string dobStr = r["dob"].ToString();
-                    if(DateTime.TryParse(dobStr, CultureInfo.InvariantCulture, DateTimeStyles.None, out dob) == false)
-                    {
-                        Console.WriteLine("Couldn't parse the dob: " + dobStr + "; DriverId: " + driver.Id);
-                    }
-                    else
-                    {
-                        driver.DateOfBirth = dob;
-                    }
+                DateTime dob;
+                string dobStr = r["dob"].ToString();
+                if (DateTime.TryParse(dobStr, CultureInfo.InvariantCulture, DateTimeStyles.None, out dob) == false)
+                {
+                    Console.WriteLine("Couldn't parse the dob: " + dobStr + "; DriverId: " + driver.Id);
+                }
+                else
+                {
+                    driver.DateOfBirth = dob;
+                }
 
-                    return driver;
+                return driver;
+            });
+        }
 
-                }).ToList();
-            }
+        private IEnumerable<Circuit> GetCircuits()
+        {
+            return Get("SELECT * FROM circuits", r => new Circuit
+            {
+                Id = int.Parse(r["circuitId"].ToString()),
+                CircuitRef = r["circuitRef"].ToString(),
+                Name = r["name"].ToString(),
+                Location = r["location"].ToString(),
+                Country = r["country"].ToString(),
+                Lat = float.Parse(r["lat"].ToString()),
+                Lng = float.Parse(r["lng"].ToString()),
+                Url = r["url"].ToString()
+            });
         }
 
         private IEnumerable<Season> GetSeasons()
         {
+            return Get("SELECT * FROM seasons", r => new Season
+            {
+                Year = int.Parse(r["year"].ToString()),
+                Url = r["url"].ToString()
+            });
+        }
+
+        private IEnumerable<TModel> Get<TModel>(string query, Func<DbDataReader, TModel> projection)
+        {
             using (DbConnection connection = new MySqlConnection(_mySqlConnectionString))
-            using (DbCommand cmd = new MySqlCommand("SELECT * FROM seasons"))
+            using (DbCommand cmd = new MySqlCommand(query))
             {
                 connection.Open();
                 cmd.Connection = connection;
                 var reader = cmd.ExecuteReader();
 
-                return reader.Select(r => new Season
-                {
-                    Year = int.Parse(r["year"].ToString()),
-                    Url = r["url"].ToString()
-                }).ToList();
+                return reader.Select(projection).ToList();
             }
         }
+    }
+
+    public class Circuit
+    {
+        public int Id { get; set; }
+        public string CircuitRef { get; set; }
+        public string Name { get; set; }
+        public string Location { get; set; }
+        public string Country { get; set; }
+        public float Lat { get; set; }
+        public float Lng { get; set; }
+        public string Url { get; set; }
     }
 
     public class Driver
@@ -125,6 +176,28 @@ namespace F1Graph.MySql.Etl
             return driver.DateOfBirth != null
                 ? new DriverEntity(driver.Id.ToString(CultureInfo.InvariantCulture), driver.Firstname, driver.Surname, driver.Nationality, driver.Url, driver.DateOfBirth.Value)
                 : new DriverEntity(driver.Id.ToString(CultureInfo.InvariantCulture), driver.Firstname, driver.Surname, driver.Nationality, driver.Url);
+        }
+
+        public static CircuitEntity ToEntity(this Circuit circuit)
+        {
+            var location = new Location(circuit.Lat, circuit.Lng);
+
+            return new CircuitEntity(
+                circuit.Id.ToString(CultureInfo.InvariantCulture),
+                circuit.Name,
+                circuit.Location,
+                circuit.Country,
+                location,
+                circuit.Url);
+        }
+
+        public static void Drop<TEntity>(this IMongoCollection<TEntity> collection)
+        {
+            if (collection == null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
+            collection.Database.DropCollectionAsync(collection.CollectionNamespace.CollectionName).Wait();
         }
     }
 }
