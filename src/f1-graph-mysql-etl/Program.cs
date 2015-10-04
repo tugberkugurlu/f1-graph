@@ -23,7 +23,7 @@ namespace F1Graph.MySql.Etl
         private readonly string _mongoDbConnectionStr = "mongodb://172.17.0.16:27017";
 
         public async Task Main(string[] args)
-        {    
+        {
             var mongoDatabase = ConfigureAndGetMongoDatabase();
             var driversCollection = mongoDatabase.GetCollection<DriverEntity>("drivers");
             var constructorsCollection = mongoDatabase.GetCollection<ConstructorEntity>("constructors");
