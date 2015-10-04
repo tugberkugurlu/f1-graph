@@ -123,8 +123,8 @@ namespace F1Graph.MySql.Etl
         public static DriverEntity ToEntity(this Driver driver)
         {
             return driver.DateOfBirth != null
-                ? new DriverEntity(driver.Firstname, driver.Surname, driver.Nationality, driver.Url, driver.DateOfBirth.Value)
-                : new DriverEntity(driver.Firstname, driver.Surname, driver.Nationality, driver.Url);
+                ? new DriverEntity(driver.Id.ToString(CultureInfo.InvariantCulture), driver.Firstname, driver.Surname, driver.Nationality, driver.Url, driver.DateOfBirth.Value)
+                : new DriverEntity(driver.Id.ToString(CultureInfo.InvariantCulture), driver.Firstname, driver.Surname, driver.Nationality, driver.Url);
         }
     }
 }

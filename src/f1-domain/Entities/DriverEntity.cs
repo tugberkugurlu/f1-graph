@@ -6,18 +6,20 @@ namespace F1.Domain.Entities
 {
     public class DriverEntity : BaseEntity
     {
-        public DriverEntity(string firstName, string lastName, string nationality, string url)
-            : this(firstName, lastName, nationality, url, null)
+        public DriverEntity(string originId, string firstName, string lastName, string nationality, string url)
+            : this(originId, firstName, lastName, nationality, url, null)
         {
         }
 
-        public DriverEntity(string firstName, string lastName, string nationality, string url, DateTime dateOfBirth)
-            : this(firstName, lastName, nationality, url, new OccurrenceRecord(dateOfBirth))
+        public DriverEntity(string originId, string firstName, string lastName, string nationality, string url, DateTime dateOfBirth)
+            : this(originId, firstName, lastName, nationality, url, new OccurrenceRecord(dateOfBirth))
         {
         }
 
-        private DriverEntity(string firstName, string lastName, string nationality, string url, OccurrenceRecord dateOfBirth)
+        private DriverEntity(string originId, string firstName, string lastName, string nationality, string url, OccurrenceRecord dateOfBirth)
         {
+            if (originId == null)
+                throw new ArgumentNullException("originId");
             if (firstName == null)
                 throw new ArgumentNullException("firstName");
             if (lastName == null)
@@ -27,6 +29,7 @@ namespace F1.Domain.Entities
             if (url == null)
                 throw new ArgumentNullException("url");
 
+            OriginId = originId;
             Firstname = firstName;
             Lastname = lastName;
             Nationality = nationality;
@@ -34,6 +37,7 @@ namespace F1.Domain.Entities
             DateOfBirth = dateOfBirth;
         }
 
+        public string OriginId { get; private set; }
         public string Firstname { get; private set; }
         public string Lastname { get; private set; }
         public string Nationality { get; private set; }
