@@ -27,7 +27,7 @@ namespace F1.Domain
         {
             _helper = new SerializerHelper
             (
-                new SerializerHelper.Member("unixEpoch", Flags.UnixEpoch),
+                new SerializerHelper.Member("msSinceEpoch", Flags.UnixEpoch),
                 new SerializerHelper.Member("timeZoneId", Flags.TimeZoneId)
             );
         }
@@ -37,7 +37,7 @@ namespace F1.Domain
             var bsonWriter = context.Writer;
             var dateTimeOffset = value.ToDateTimeOffset();
             bsonWriter.WriteStartDocument();
-            bsonWriter.WriteInt64("unixEpoch", BsonUtils.ToMillisecondsSinceEpoch(dateTimeOffset.UtcDateTime));
+            bsonWriter.WriteInt64("msSinceEpoch", BsonUtils.ToMillisecondsSinceEpoch(dateTimeOffset.UtcDateTime));
             bsonWriter.WriteString("timeZoneId", value.Zone.Id);
             bsonWriter.WriteEndDocument();
         }
