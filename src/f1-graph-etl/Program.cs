@@ -10,11 +10,16 @@ namespace F1Graph.Etl
 {
     public class Program
     {
+        public static void Main(string[] args)
+        {
+            MainImpl(args).GetAwaiter().GetResult();
+        }
+
         /// <remarks>
         /// Delaying the calls on purpose because of 'Responsible Use': http://ergast.com/mrd/terms. However,
         /// this model is really not working out well. So, I need to pull them in bulk.
         /// </remarks>
-        public async Task Main(string[] args)
+        private static async Task MainImpl(string[] args)
         {
             using (var client = new HttpClient() { BaseAddress = new Uri("http://ergast.com/") })
             {
@@ -33,7 +38,7 @@ namespace F1Graph.Etl
             }
         }
 
-        private async Task<Season[]> GetSeasonsAsync(HttpClient client)
+        private static async Task<Season[]> GetSeasonsAsync(HttpClient client)
         {
             var response = await client.GetAsync("api/f1/seasons.json?limit=100");
             var content = await response.Content.ReadAsAsync<JObject>();
@@ -42,7 +47,7 @@ namespace F1Graph.Etl
             return seasons;
         }
 
-        private async Task<Race[]> GetRacesAsync(HttpClient client, int seasonYear)
+        private static async Task<Race[]> GetRacesAsync(HttpClient client, int seasonYear)
         {
             // Well, limit=100 will work here for now as I know there are only 20ish races per season.
             var response = await client.GetAsync($"api/f1/{seasonYear}.json?limit=100");

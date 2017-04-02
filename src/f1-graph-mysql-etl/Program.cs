@@ -2,13 +2,11 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-using System.Data.SqlClient;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using F1.Domain;
 using MongoDB.Driver;
-using Nte.Identity.Domain;
 using F1.Domain.Entities;
 using F1.Domain.ValueObjects;
 
@@ -19,10 +17,15 @@ namespace F1Graph.MySql.Etl
     /// </remarks>
     public class Program
     {
-        private readonly string _mySqlConnectionString = "Data Source=172.17.0.12;port=3306;Initial Catalog=f1;User Id=root;password=1234567890";
-        private readonly string _mongoDbConnectionStr = "mongodb://172.17.0.16:27017";
+        private const string _mySqlConnectionString = "Data Source=172.17.0.12;port=3306;Initial Catalog=f1;User Id=root;password=1234567890";
+        private const string _mongoDbConnectionStr = "mongodb://172.17.0.16:27017";
 
-        public async Task Main(string[] args)
+        public static void Main(string[] args) 
+        {
+            MainImpl(args).GetAwaiter().GetResult();
+        }
+
+        private static async Task MainImpl(string[] args)
         {
             var mongoDatabase = ConfigureAndGetMongoDatabase();
             var driversCollection = mongoDatabase.GetCollection<DriverEntity>("drivers");
@@ -83,7 +86,7 @@ namespace F1Graph.MySql.Etl
             }
         }
 
-        private IMongoDatabase ConfigureAndGetMongoDatabase()
+        private static IMongoDatabase ConfigureAndGetMongoDatabase()
         {
             var client = new MongoClient(_mongoDbConnectionStr);
             var database = client.GetDatabase("f1");
@@ -93,7 +96,7 @@ namespace F1Graph.MySql.Etl
             return database;
         }
 
-        private IEnumerable<Driver> GetDrivers()
+        private static IEnumerable<Driver> GetDrivers()
         {
             return Get("SELECT * FROM drivers", r =>
             {
@@ -122,7 +125,7 @@ namespace F1Graph.MySql.Etl
             });
         }
 
-        private IEnumerable<Constructor> GetConstructors()
+        private static IEnumerable<Constructor> GetConstructors()
         {
             return Get("SELECT * FROM constructors", r => new Constructor
             {
@@ -134,7 +137,7 @@ namespace F1Graph.MySql.Etl
             });
         }
 
-        private IEnumerable<Circuit> GetCircuits()
+        private static IEnumerable<Circuit> GetCircuits()
         {
             return Get("SELECT * FROM circuits", r => new Circuit
             {
@@ -149,7 +152,7 @@ namespace F1Graph.MySql.Etl
             });
         }
 
-        private IEnumerable<Season> GetSeasons()
+        private static IEnumerable<Season> GetSeasons()
         {
             return Get("select * from seasons order by year", r => new Season
             {
@@ -158,7 +161,7 @@ namespace F1Graph.MySql.Etl
             });
         }
 
-        private IEnumerable<TModel> Get<TModel>(string query, Func<DbDataReader, TModel> projection)
+        private static IEnumerable<TModel> Get<TModel>(string query, Func<DbDataReader, TModel> projection)
         {
             using (DbConnection connection = new MySqlConnection(_mySqlConnectionString))
             using (DbCommand cmd = new MySqlCommand(query))

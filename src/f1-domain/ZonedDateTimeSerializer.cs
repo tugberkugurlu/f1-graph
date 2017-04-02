@@ -62,7 +62,7 @@ namespace F1.Domain
                     }
                 });
 
-                var instant = Instant.FromMillisecondsSinceUnixEpoch(epoch);
+                var instant = Instant.FromUnixTimeMilliseconds(epoch);
                 return new ZonedDateTime(instant, timeZone);
             }
             else

@@ -1,15 +1,26 @@
 {
     "version": "1.0.0",
+    "buildOptions": {
+        "emitEntryPoint": true,
+        "preserveCompilationContext": true
+    },
+    "runtimeOptions": {
+        "configProperties": {
+            "System.GC.Server": true
+        }
+    },
     "dependencies": {
-        "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-beta7",
-        "MySql.Data": "6.9.7",
-        "MongoDB.Driver": "2.0.1",
-        "f1-domain": ""
+        "MySql.Data": "7.0.7-m61",
+        "MongoDB.Driver": "2.4.3",
+        "f1-domain": "*"
     },
     "frameworks": {
-        "dnx451": {
-            "frameworkAssemblies": {
-              "System.Data": "4.0.0.0"
+        "netcoreapp1.1": {
+            "dependencies": {
+                "Microsoft.NETCore.App": {
+                    "version": "1.1.0",
+                    "type": "platform"
+                }
             }
         }
     }
