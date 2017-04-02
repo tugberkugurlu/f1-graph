@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.0.0
+MinimumVisualStudioVersion = 10.0.0.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "f1-domain", "src\f1-domain\f1-domain.csproj", "{5F37868D-B8C8-40DC-A9F7-43F17C316894}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "f1-graph-etl", "src\f1-graph-etl\f1-graph-etl.csproj", "{29839CB3-166E-49EA-94A6-9D5647F884F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "f1-graph-mysql-etl", "src\f1-graph-mysql-etl\f1-graph-mysql-etl.csproj", "{10C24EE5-0713-4C55-8D07-2A7DF41703B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F37868D-B8C8-40DC-A9F7-43F17C316894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F37868D-B8C8-40DC-A9F7-43F17C316894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F37868D-B8C8-40DC-A9F7-43F17C316894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F37868D-B8C8-40DC-A9F7-43F17C316894}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29839CB3-166E-49EA-94A6-9D5647F884F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29839CB3-166E-49EA-94A6-9D5647F884F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29839CB3-166E-49EA-94A6-9D5647F884F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29839CB3-166E-49EA-94A6-9D5647F884F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10C24EE5-0713-4C55-8D07-2A7DF41703B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10C24EE5-0713-4C55-8D07-2A7DF41703B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10C24EE5-0713-4C55-8D07-2A7DF41703B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10C24EE5-0713-4C55-8D07-2A7DF41703B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
