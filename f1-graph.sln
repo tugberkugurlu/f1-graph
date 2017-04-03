@@ -15,6 +15,7 @@ ProjectSection(SolutionItems) = preProject
 	.travis.yml = .travis.yml
 	set-build-version.sh = set-build-version.sh
 	build.sh = build.sh
+	NuGet.Config = NuGet.Config
 EndProjectSection
 EndProject
 Global
