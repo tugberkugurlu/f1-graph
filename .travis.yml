@@ -16,7 +16,7 @@ install:
 
 before_script:
   - chmod u+x build.sh
-  - chmod u+x ./scripts/set-build-version.sh
+  - chmod u+x set-build-version.sh
   - eval $(./set-build-version.sh)
   - dotnet --info
 
