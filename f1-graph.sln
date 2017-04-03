@@ -18,6 +18,11 @@ ProjectSection(SolutionItems) = preProject
 	NuGet.Config = NuGet.Config
 EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{06601F4C-2ED1-442C-819D-A01CBFF49752}"
+ProjectSection(SolutionItems) = preProject
+	LICENSE = LICENSE
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
